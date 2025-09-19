@@ -1,0 +1,14 @@
+[package]
+name = "mania-changer"
+version = "0.1.0"
+edition = "2024"
+
+[features]
+rates = []
+ln = []
+marathon = []
+full = ["rates", "ln", "marathon"]
+
+[dependencies]
+rosu-map = "0.2.1"
+
