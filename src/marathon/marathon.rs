@@ -16,60 +16,60 @@ pub fn concat_beatmaps(beatmaps: Vec<Beatmap>, gap_ms: Option<f64>) -> Beatmap {
     let gap_ms = gap_ms.unwrap_or(0.0);
     let mut result = beatmaps[0].clone();
     
-    // Si on n'a qu'une beatmap, on la retourne telle quelle
+    // If we only have one beatmap, return it as is
     if beatmaps.len() == 1 {
         return result;
     }
 
-    // Calculer la durée totale de la première beatmap
+    // Calculate the total duration of the first beatmap
     let mut current_time_offset = get_beatmap_duration(&result) + gap_ms;
 
-    // Concaténer les beatmaps restantes
+    // Concatenate the remaining beatmaps
     for (_i, beatmap) in beatmaps.iter().enumerate().skip(1) {
-        // Concaténer les hit objects
+        // Concatenate hit objects
         for mut hit_object in beatmap.hit_objects.clone() {
             hit_object.start_time += current_time_offset;
             result.hit_objects.push(hit_object);
         }
 
-        // Concaténer les timing points
+        // Concatenate timing points
         for mut timing_point in beatmap.control_points.timing_points.clone() {
             timing_point.time += current_time_offset;
             result.control_points.timing_points.push(timing_point);
         }
 
-        // Concaténer les effect points
+        // Concatenate effect points
         for mut effect_point in beatmap.control_points.effect_points.clone() {
             effect_point.time += current_time_offset;
             result.control_points.effect_points.push(effect_point);
         }
 
-        // Concaténer les difficulty points
+        // Concatenate difficulty points
         for mut difficulty_point in beatmap.control_points.difficulty_points.clone() {
             difficulty_point.time += current_time_offset;
             result.control_points.difficulty_points.push(difficulty_point);
         }
 
-        // Concaténer les sample points
+        // Concatenate sample points
         for mut sample_point in beatmap.control_points.sample_points.clone() {
             sample_point.time += current_time_offset;
             result.control_points.sample_points.push(sample_point);
         }
 
-        // Mettre à jour le temps de décalage pour la prochaine beatmap
+        // Update the time offset for the next beatmap
         current_time_offset += get_beatmap_duration(beatmap) + gap_ms;
     }
 
-    // Trier tous les points de contrôle par temps
+    // Sort all control points by time
     result.control_points.timing_points.sort_by(|a, b| a.time.partial_cmp(&b.time).unwrap());
     result.control_points.effect_points.sort_by(|a, b| a.time.partial_cmp(&b.time).unwrap());
     result.control_points.difficulty_points.sort_by(|a, b| a.time.partial_cmp(&b.time).unwrap());
     result.control_points.sample_points.sort_by(|a, b| a.time.partial_cmp(&b.time).unwrap());
 
-    // Trier les hit objects par temps
+    // Sort hit objects by time
     result.hit_objects.sort_by(|a, b| a.start_time.partial_cmp(&b.start_time).unwrap());
 
-    // Mettre à jour les métadonnées
+    // Update metadata
     result.version = format!("{} Marathon ({} maps)", result.version, beatmaps.len());
 
     result
@@ -125,10 +125,10 @@ pub fn concat_beatmaps_with_transitions(beatmaps: Vec<Beatmap>, transitions: Opt
     let mut current_time_offset = get_beatmap_duration(&result);
 
     for (_i, beatmap) in beatmaps.iter().enumerate().skip(1) {
-        // Ajouter la transition
+        // Add the transition
         current_time_offset += transitions[_i - 1];
 
-        // Concaténer les éléments de la beatmap
+        // Concatenate beatmap elements
         for mut hit_object in beatmap.hit_objects.clone() {
             hit_object.start_time += current_time_offset;
             result.hit_objects.push(hit_object);
@@ -157,7 +157,7 @@ pub fn concat_beatmaps_with_transitions(beatmaps: Vec<Beatmap>, transitions: Opt
         current_time_offset += get_beatmap_duration(beatmap);
     }
 
-    // Trier tous les éléments par temps
+    // Sort all elements by time
     result.control_points.timing_points.sort_by(|a, b| a.time.partial_cmp(&b.time).unwrap());
     result.control_points.effect_points.sort_by(|a, b| a.time.partial_cmp(&b.time).unwrap());
     result.control_points.difficulty_points.sort_by(|a, b| a.time.partial_cmp(&b.time).unwrap());
